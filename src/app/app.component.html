@@ -1,0 +1,47 @@
+<div class="wrapper" [transition-group]="'flip-list'">
+  <div
+    class="item"
+    draggable="true"
+    [class.dragging]="draggedItem === item"
+    (dragstart)="handleDragStart($event, item)"
+    (dragend)="handleDragEnd($event, item)"
+    (drop)="handleDrop($event, item)"
+    (dragenter)="handleItemDragEnter($event, item)"
+    (dragleave)="handleItemDragLeave($event, item)"
+    *ngFor="let item of reorderedItems; trackBy: trackById"
+    transition-group-item
+  >
+    <div
+      class="separator left"
+      [class.over]="
+        draggingOverItem === item && draggingOverSeparator === 'left'
+      "
+      (dragenter)="handleSeparatorDragEnter($event, item, 'left')"
+      (dragleave)="handleSeparatorDragLeave($event, item, 'left')"
+    ></div>
+    <div class="content" *ngIf="item.type === 'App'">{{ item.id }}</div>
+    <div
+      class="content category"
+      *ngIf="item.type === 'Category'"
+      [class.dragging-over]="item === draggingOverCategory"
+      (dragenter)="handleContentDragEnter($event, item)"
+      (dragleave)="handleContentDragLeave($event, item)"
+    >
+      <ng-container
+        *ngFor="let app of [1, 2, 3, 4, 5, 6, 7, 8, 9]; let index = index"
+      >
+        <div class="app">
+          {{ app }}
+        </div>
+      </ng-container>
+    </div>
+    <div
+      class="separator right"
+      [class.over]="
+        draggingOverItem === item && draggingOverSeparator === 'right'
+      "
+      (dragenter)="handleSeparatorDragEnter($event, item, 'right')"
+      (dragleave)="handleSeparatorDragLeave($event, item, 'right')"
+    ></div>
+  </div>
+</div>
