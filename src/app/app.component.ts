@@ -8,7 +8,7 @@ import {
   trigger,
   useAnimation,
 } from '@angular/animations';
-import { Component, HostBinding } from '@angular/core';
+import { Component, HostBinding, QueryList, ViewChildren } from '@angular/core';
 
 export const pulse = trigger('pulse', [
   transition(
@@ -63,7 +63,7 @@ export const pulse = trigger('pulse', [
   selector: 'my-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  animations: [pulse],
+  //animations: [pulse],
 })
 export class AppComponent {
   items = [
@@ -117,7 +117,6 @@ export class AppComponent {
   draggingOverItem;
   draggingOverSeparator;
   draggingOverCategory;
-  transitionning = false;
 
   @HostBinding('class.dragging')
   get dragging(): boolean {
@@ -128,16 +127,21 @@ export class AppComponent {
     this.draggedItem = item;
 
     e.dataTransfer.effectAllowed = 'copyMove';
-    //e.dataTransfer.setData('text/html', this.innerHTML);
+    setTimeout(() => {
+      e.target.style.visibility = 'hidden';
+    }, 0);
   }
 
   handleDragEnd(e, item) {
+    console.log('DRAG END');
     this.draggedItem = null;
     this.draggingOverItem = null;
     this.draggingOverSeparator = null;
 
     this.items = [...this.reorderedItems];
-    console.log('DRAG END');
+    setTimeout(() => {
+      e.target.style.visibility = 'visible';
+    }, 0);
   }
 
   handleItemDragEnter(e, item) {
@@ -149,9 +153,6 @@ export class AppComponent {
   }
 
   handleSeparatorDragEnter(e, item, direction) {
-    if (this.transitionning) {
-      return;
-    }
     if (this.draggedItem === item) {
       return;
     }
@@ -169,10 +170,6 @@ export class AppComponent {
     newList.splice(position, 0, this.draggedItem);
     console.log({ item, direction, position, daggedItem: this.draggedItem });
     this.reorderedItems = newList;
-    this.transitionning = true;
-    setTimeout(() => {
-      this.transitionning = false;
-    }, 200);
   }
 
   handleSeparatorDragLeave(e, item, direction) {
@@ -180,33 +177,35 @@ export class AppComponent {
   }
 
   handleContentDragEnter(e, item) {
-    if (this.transitionning) {
+    e.preventDefault();
+
+    if (this.draggingOverCategory) {
       return;
     }
     if (this.draggedItem.type === 'Category') {
       return;
     }
 
-    console.log('DRAGGING OVER CATEGORY');
+    console.log('ENTER DRAGGING OVER CATEGORY');
 
     this.draggingOverCategory = item;
-    this.reorderedItems = [...this.items].filter((i) => i !== this.draggedItem);
-    this.transitionning = true;
-    setTimeout(() => {
-      this.transitionning = false;
-    }, 200);
   }
 
   handleContentDragLeave(e, item) {
+    console.log('LEAVE DRAGGING OVER CATEGORY');
     this.draggingOverCategory = null;
   }
 
-  handleDrop(e, item) {
-    e.stopPropagation(); // stops the browser from redirecting.
+  handleContentDragOver(e, item) {
+    e.preventDefault();
+  }
 
-    console.log('DROPPED');
-
-    return false;
+  handleContentDrop(e, item) {
+    console.log('DROP DRAGGING OVER CATEGORY');
+    this.draggingOverCategory = null;
+    this.reorderedItems = [...this.reorderedItems].filter(
+      (i) => i !== this.draggedItem
+    );
   }
 
   trackById(index, item) {

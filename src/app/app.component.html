@@ -1,15 +1,14 @@
-<div class="wrapper" [transition-group]="'flip-list'">
+<div class="wrapper" (dragover)="$event.preventDefault()">
   <div
     class="item"
     draggable="true"
     [class.dragging]="draggedItem === item"
+    [class.hidden]="draggedItem === item && draggingOverCategory"
     (dragstart)="handleDragStart($event, item)"
     (dragend)="handleDragEnd($event, item)"
-    (drop)="handleDrop($event, item)"
     (dragenter)="handleItemDragEnter($event, item)"
     (dragleave)="handleItemDragLeave($event, item)"
     *ngFor="let item of reorderedItems; trackBy: trackById"
-    transition-group-item
   >
     <div
       class="separator left"
@@ -26,6 +25,8 @@
       [class.dragging-over]="item === draggingOverCategory"
       (dragenter)="handleContentDragEnter($event, item)"
       (dragleave)="handleContentDragLeave($event, item)"
+      (dragover)="handleContentDragOver($event, item)"
+      (drop)="handleContentDrop($event, item)"
     >
       <ng-container
         *ngFor="let app of [1, 2, 3, 4, 5, 6, 7, 8, 9]; let index = index"

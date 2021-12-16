@@ -38,15 +38,23 @@
           width: 30%;
         }
       }
+
+      * {
+        pointer-events: none;
+      }
     }
 
     &.dragging {
-      transition: 0.001s;
-      transform: translateX(-999999px);
+      //transition: 0.001s;
+      //transform: translateX(-999999px);
 
       .content {
         //background-color: orangered;
       }
+    }
+
+    &.hidden {
+      display: none;
     }
   }
 
